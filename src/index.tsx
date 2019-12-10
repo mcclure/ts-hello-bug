@@ -1,12 +1,16 @@
-import { h, render, Context, createContext, JSX } from "preact";
-import { useContext } from "preact/hooks";
-import { OrderedSet } from "immutable"
-
-declare let require:any
-
 let verbose = false
 
 // ---- Helpers ----
+
+namespace JSX { export class Element {} }
+class Context<T> { constructor( public value: T) }
+function createContext<T>(x : T) { return new Context(x) }
+function useContext(x : Context<T>) { return x.value }
+
+class OrderedSet<T> {
+  public value:T
+  constructor() {}
+}
 
 class Refresher {
   private refreshed = true
@@ -38,7 +42,7 @@ class StateGroup {
   constructor(public states:State<any>[]) {}
   render(inside:JSX.Element) {
     for (let X of this.states) {
-      inside = <X.context.Provider value={X.value}>{inside}</X.context.Provider>
+      inside = new JSX.Element()
     }
     return inside
   }
@@ -50,14 +54,14 @@ let parentNode = document.getElementById("content")
 let replaceNode = document.getElementById("initial-loading")
 
 let SelfId = new State("")
-let PreconnectList = new State(OrderedSet<string>())
-let ConnectList = new State(OrderedSet<string>())
+let PreconnectList = new State(new OrderedSet<string>())
+let ConnectList = new State(new OrderedSet<string>())
 
 let states = new StateGroup([SelfId, PreconnectList, ConnectList])
 
 function UserBox() {
   const selfId = useContext(SelfId.context)
-  return <div>You are {selfId ? selfId : "[pending]"}</div>
+  return 3
 }
 
 // HERE IS THE LINE WITH THE CURSE
