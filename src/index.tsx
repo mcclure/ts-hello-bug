@@ -1,3 +1,6 @@
+import Chessground from 'react-chessground'
+// import 'react-chessground/dist/styles/chessground.css'
+
 import { h, render, Component } from "preact";
 
 declare let require:any
@@ -13,7 +16,7 @@ class Content extends Component<any, any> {
 
   render() {
     return (
-      <div>Hello</div>
+      <ChessGround />
     )
   }
 }

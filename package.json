@@ -9,6 +9,7 @@
   "license": "CC0-1.0",
   "dependencies": {
     "preact": "^10.1.0",
+    "react-chessground": "^1.1.0",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
   },
