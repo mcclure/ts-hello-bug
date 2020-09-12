@@ -9,7 +9,7 @@
   "license": "CC0-1.0",
   "dependencies": {
     "immutable": "^4.0.0-rc.12",
-    "preact": "^10.1.0",
+    "preact": "^10.4.8",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
   },
