@@ -1,9 +1,10 @@
 import { h, render, Component } from "preact";
-
-declare let require:any
+import { List } from "immutable"
 
 let parentNode = document.getElementById("content")
 let replaceNode = document.getElementById("initial-loading")
+
+let demoList = List<string>().push("one").push("two")
 
 class Content extends Component<any, any> {
   constructor(props:{}) {
@@ -12,8 +13,15 @@ class Content extends Component<any, any> {
   }
 
   render() {
+    const divArray = demoList.map(
+      s => {
+        console.log("Inside map", typeof(s), s)
+        return <div className="Id">{s}</div>
+      }
+    ).toJS()
+
     return (
-      <div>Hello</div>
+      <div>Hello<br />{divArray}</div>
     )
   }
 }
