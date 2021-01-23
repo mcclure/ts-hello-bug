@@ -14,6 +14,9 @@ let lastCanvas:{canvas:HTMLCanvasElement, width:number, height:number} = null
 const animate = new State(false)
 const printFps = new State(true)
 const preserve = new State(false)
+let triggerSaveDraw = false
+
+let saveDrawBufferCache:GPUBuffer
 
 // ----- Display helpers -----
 
@@ -239,7 +242,35 @@ console.log("AppCanvas: DRAWING")
           passEncoder.drawIndexed(3, 1, 0, 0, 0);
           passEncoder.endPass();
         }
+
+
+        let triggerSaveBuffer: GPUBuffer
+        let triggerSaveSize: number
+        if (triggerSaveDraw) { // Do this before or after queue.submit??
+          const roundUp256 = (x:number) => Math.ceil(x/256)*256
+          triggerSaveSize = canvas.width*canvas.height*4
+          const desc = { size: roundUp256(triggerSaveSize), usage:GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST }
+          triggerSaveBuffer = device.createBuffer(desc)
+          const textureView = { texture:colorTexture }
+          const bufferView = { offset: 0, bytesPerRow:canvas.width*4, rowsPerImage:canvas.height, buffer:triggerSaveBuffer }
+
+          commandEncoder.copyTextureToBuffer(textureView, bufferView, {width:canvas.width, height:canvas.height, depth:undefined})
+        }
+
         queue.submit([ commandEncoder.finish() ]);
+
+        if (triggerSaveDraw) {
+          (async () => {
+            await triggerSaveBuffer.mapAsync(GPUMapMode.READ, 0, triggerSaveSize)
+            const arrayBuffer = triggerSaveBuffer.getMappedRange(0, triggerSaveSize)
+            console.log(arrayBuffer)
+            // Terrifying oneliner from https://stackoverflow.com/questions/9267899/arraybuffer-to-base64-encoded-string
+            // Notice: Data is not PNG encoded >_> I use this program to view it. https://github.com/sveinbjornt/PixlView
+            canvas2image.saveFile(canvas2image.makeURI(btoa(Array.from(new Uint8Array(arrayBuffer)).map(b => String.fromCharCode(b)).join('')), canvas2image.downloadMime), "rgba", "download-cttb")
+            triggerSaveBuffer.destroy()
+          })()
+          triggerSaveDraw = false
+        }
       }
 
       if (animateV) {
@@ -294,7 +325,11 @@ function Controls() {
 
         canvas2image.saveAsImage(tempCanvas, bitmap.width, bitmap.height, "png", "download-cib")
       }
-    })}>createImageBitmap</a>
+    })}>createImageBitmap</a><br />
+    <a href="#" onClick={handle(()=>{
+      triggerSaveDraw = true
+    })}>copyTextureToBuffer</a>
+
   </div>
 }
 

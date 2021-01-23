@@ -313,7 +313,10 @@ const Canvas2Image = (function (contextType:string) {
     };
 
     return {
-        saveAsImage: saveAsImage,
+        saveAsImage,
+        saveFile,
+        makeURI,
+        downloadMime,
         saveAsPNG: function (canvas, width, height, fileName) {
             return saveAsImage(canvas, width, height, "png", fileName);
         },
