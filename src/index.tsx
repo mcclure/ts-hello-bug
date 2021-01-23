@@ -44,6 +44,9 @@ console.log("AppCanvas: UNMOUNT")
 
       const context = canvas.getContext("gpupresent", attributes)
       const gpuContext = (context as any) as GPUCanvasContext
+
+      makeHidpi2D(canvas, context)
+
 console.log("AppCanvas: DRAWING")
 
       const width  = canvas.width

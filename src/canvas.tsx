@@ -44,7 +44,7 @@ function Canvas<T>(props : CanvasProps<T>) {
   return <canvas style={canvasStyle} ref={canvasRef} {...props} />
 }
 
-function makeHidpi2D(canvas:HTMLCanvasElement, context:CanvasRenderingContext2D) {
+function makeHidpi2D(canvas:HTMLCanvasElement, context:RenderingContext) {
   const { width, height } = canvas.getBoundingClientRect()
   const { devicePixelRatio=1 } = window
   canvas.style.width = `${width}px`
