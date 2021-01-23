@@ -1,6 +1,5 @@
 import { h, JSX, render, Component } from "preact";
-import { LargestPossibleCanvas, makeHidpi2D } from "./canvas"
-import { State, WrapStateContexts } from "./state"
+import { makeHidpi2D } from "./canvas"
 
 import _canvas2image from "./canvas2image"
 const canvas2image = _canvas2image("gpupresent")
@@ -10,39 +9,23 @@ const canvas2image = _canvas2image("gpupresent")
 
 // ----- Data -----
 
-let lastCanvas:{canvas:HTMLCanvasElement, width:number, height:number} = null
-const animate = new State(false)
-const printFps = new State(true)
-const preserve = new State(false)
+const animateV = false
+const printFpsV = true
+const preserveV = false
 let triggerSaveDraw = false
 
 let saveDrawBufferCache:GPUBuffer
 
 // ----- Display helpers -----
 
-// Turn a function into a compliant event handler
-function handle(f:()=>void) {
-  return (e:JSX.TargetedEvent) => {
-    e.preventDefault();
-    f();
-    return true;
-  }
-}
+async function AppCanvas({gpu}:{gpu:GPU}) {
+  const attributes = preserveV ? { preserveDrawingBuffer: true } : undefined
+  const stillMounted = true
 
-function AppCanvas({gpu}:{gpu:GPU}) {
-  let stillMounted = true
-  const preserveV = preserve.get()
-  const animateV = animate.get()
-
-  return <LargestPossibleCanvas
-    onUnmount={() => {
-      stillMounted = false
-console.log("AppCanvas: UNMOUNT")
-    }} 
-    onMount={async (canvas) => {
-      const attributes = preserveV ? { preserveDrawingBuffer: true } : undefined
-
+  const canvas = document.getElementById("staticCanvas") as HTMLCanvasElement
+  {
       const context = canvas.getContext("gpupresent", attributes)
+makeHidpi2D(canvas, context)
       const gpuContext = (context as any) as GPUCanvasContext
 console.log("AppCanvas: DRAWING")
 
@@ -199,7 +182,7 @@ console.log("AppCanvas: DRAWING")
           if (animateV) {
             const now = new Date().getTime();
 
-            if (printFps) { // Print FPS
+            if (printFpsV) { // Print FPS
               if (lastPrintedFps === undefined) {
                 console.log("AppCanvas: STARTING FPS PRINT")
                 lastPrintedFps = now;
@@ -286,74 +269,14 @@ console.log("AppCanvas: STARTING ANIMATE")
       } else {
         frame()
       }
-
-      lastCanvas = {canvas, width, height}
-    }}
-  />
-}
-
-function Checkbox({state, label}:{state:State<boolean>, label:string|JSX.Element}) {
-  const v = state.get()
-  return <span>
-          <input className="ToggleButton" type="checkbox" checked={v}
-            onInput={(e:JSX.TargetedEvent<HTMLInputElement>) => state.set(e.currentTarget.checked)} />
-            {label}
-         </span>
-}
-
-function Controls() {
-  return <div className="Controls">
-    <Checkbox state={animate} label="Animate" /><br />
-    <Checkbox state={printFps} label="Print FPS" /><br />
-    <Checkbox state={preserve} label="preserveDrawingBuffer" /><br />
-    <a href="#" onClick={handle(()=>{
-      if (lastCanvas) {
-        const {canvas, width, height} = lastCanvas
-        canvas2image.saveAsPNG(canvas, width, height, "download-tdu")
-      }
-    })}>toDataURL</a>
-    <br />
-    <a href="#" onClick={handle(async ()=>{
-      if (lastCanvas) {
-        const {canvas, width, height} = lastCanvas
-        const bitmap = await createImageBitmap(canvas)
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = bitmap.width;
-        tempCanvas.height = bitmap.height;
-        const context = tempCanvas.getContext('bitmaprenderer');
-        context.transferFromImageBitmap(bitmap);
-
-        canvas2image.saveAsImage(tempCanvas, bitmap.width, bitmap.height, "png", "download-cib")
-      }
-    })}>createImageBitmap</a><br />
-    <a href="#" onClick={handle(()=>{
-      triggerSaveDraw = true
-    })}>copyTextureToBuffer</a>
-
-  </div>
-}
+    }
+  }
 
 // ----- Display -----
 
-let parentNode = document.getElementById("content")
-let replaceNode = document.getElementById("initial-loading")
-
 function Content() {
   const gpu = navigator.gpu
-  if (!gpu) {
-      return <div className="TopError">
-        This app requires WebGPU. Either your browser does not support WebGPU, or you must enable an experimental flag to access it.
-      </div>
-  }
-
-  return (
-    <div className="Content">
-      <Controls />
-      <AppCanvas gpu={gpu} />
-    </div>)
+  AppCanvas({gpu})
 }
 
-render(
-  WrapStateContexts(<Content />, [animate, preserve, printFps]),
-  parentNode, replaceNode
-);
+addEventListener('load', Content)
