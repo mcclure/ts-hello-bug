@@ -153,7 +153,7 @@ console.log("AppCanvas: DRAWING")
         } ],
 
         vertexState: { // GPUVertexStateDescriptor
-          //indexFormat: "uint16", // This line is only allowed for triangle strips
+          indexFormat: "uint16", // This will cause an error, this line is only allowed for triangle strips
           vertexBuffers: [ positionBufferDesc, colorBufferDesc ]
         },
         rasterizationState: { // GPURasterizationStateDescriptor
