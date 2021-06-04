@@ -1,4 +1,5 @@
 const CopyPlugin = require('copy-webpack-plugin');
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 module.exports = {
     entry: "./src/index.tsx",
@@ -40,5 +41,6 @@ module.exports = {
                 { from: 'static' },
             ],
         }),
+        new NodePolyfillPlugin(),
     ],
 };
