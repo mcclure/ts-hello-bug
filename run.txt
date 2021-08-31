@@ -5,4 +5,4 @@ npm install && npm run build
 npx run build
 
 # Run to run
-node .
+node . -f -o garbage filename
