@@ -1,8 +1,9 @@
+# Forked from https://github.com/mcclure/ts-hello-cmdline
 # Run first time 
 npm install && npm run build
 
 # Run on change
 npx run build
 
-# Run to run
-node . -f -o garbage filename
+# Run and compare results to contents of testcase.json
+node . -d transformBackground testcase.json
