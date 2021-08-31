@@ -1,0 +1,8 @@
+# Run first time 
+npm install && npm run build
+
+# Run on change
+npx run build
+
+# Run to run
+node .
