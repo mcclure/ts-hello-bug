@@ -1,4 +1,4 @@
-This is a Typescript "Hello world" command-line app, intended for forking. Code is in `src/`. Make sure to edit the package name, license and author in package.json when you fork it, and also edit license.txt unless you want to release in the public domain.
+This is a Typescript "Hello world" command-line app, intended to demonstrate a bug. Code is in `src/`.
 
 Created by Andi McClure.
 

@@ -6,4 +6,4 @@ npm install && npm run build
 npx run build
 
 # Run and compare results to contents of testcase.json
-node . -d transformBackground testcase.json
+node . -d transformBackground testcase.json > testcase-post.json
