@@ -92,14 +92,13 @@ async function connectP2P(idKey: Uint8Array, targetKey:Uint8Array, client:boolea
         
         // This is the code for the "server"
         // Input one message then send a reply
-        // Intentionally leak promise
-        itPipe(
+        await itPipe(
           stream,
           async function (source:any) {
-            const messageRead = source.next() // Read one message and print it
+            const messageRead = await source.next() // Read one message and print it
             console.log("Server Done?", messageRead.done, "Received", messageRead.value)
             
-            return itPipe(
+            return await itPipe(
               [serverMessage1, serverMessage2],
               stream
             )
